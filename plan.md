@@ -18,7 +18,7 @@ March 2026
 | Stage 2: Backend | DONE | 2026-03-11 | Full src layout, services, routers, 12 tests passing |
 | Stage 3: Flutter Setup | DONE | 2026-03-11 | Android config, icons, splash, signing, dependencies |
 | Stage 4: Auth & Profile | DONE | 2026-03-11 | 14 hand-written + 9 generated files, all checks pass |
-| Stage 5: Downloads | TODO | | Download queue, progress, history |
+| Stage 5: Downloads | DONE | 2026-03-11 | Download queue, progress, history, settings, rate limit hotfix |
 | Stage 6: Docs | TODO | | MkDocs setup, full documentation |
 | Stage 7: CI/CD | TODO | | GitHub Actions workflows |
 | Stage 8: Polish | TODO | | Error handling, tests, hardening |
@@ -133,6 +133,69 @@ March 2026
 
 **Validations passed:** `dart format --set-exit-if-changed` clean, `dart analyze --fatal-infos` no issues, `flutter test` 1/1 pass, `build_runner build` 51 outputs generated.
 
+### Stage 5 Completion Details
+
+**Files created in `flutter_app/` submodule (19 hand-written + generated):**
+
+*Core:*
+- `lib/core/database.dart` — Drift DB with `download_sessions` + `download_jobs` tables, `appDatabaseProvider`
+- `lib/core/permissions.dart` — Storage/notification permission request helpers
+- `lib/core/notifications.dart` — flutter_local_notifications init + download-complete notification
+
+*Download feature:*
+- `lib/features/download/data/download_dao.dart` — Drift DAO: create/update sessions, insert/update jobs, watch/query
+- `lib/features/download/data/download_repository.dart` — API calls for posts/reels/stories/highlights, file download via plain Dio
+- `lib/features/download/domain/download_task.dart` — Freezed `DownloadTask` model + `DownloadTaskStatus` enum
+- `lib/features/download/domain/download_queue_state.dart` — Sealed states: QueueIdle/FetchingMetadata/Downloading/Completed/Failed
+- `lib/features/download/presentation/download_provider.dart` — `DownloadQueueNotifier` orchestrator with semaphore, pause/resume, rate-limit handling
+- `lib/features/download/presentation/download_screen.dart` — Progress UI with overall bar, per-item list, pause/resume/cancel
+- `lib/features/download/presentation/download_item_tile.dart` — Per-item tile with status icon + progress bar
+
+*History feature:*
+- `lib/features/history/data/history_dao.dart` — Drift DAO watching sessions, cascade delete
+- `lib/features/history/presentation/history_provider.dart` — Stream provider for session list
+- `lib/features/history/presentation/history_screen.dart` — History list with empty state
+- `lib/features/history/presentation/history_item_tile.dart` — Status chips (Done/Partial/Failed/Running/Paused)
+
+*Settings feature:*
+- `lib/features/settings/data/settings_repository.dart` — SharedPreferences wrapper for backend_url, max_concurrent, theme_mode, auto_delete_days
+- `lib/features/settings/presentation/settings_provider.dart` — Riverpod notifier for settings state
+- `lib/features/settings/presentation/settings_screen.dart` — Settings UI with dialogs for each option
+
+*Shared:*
+- `lib/shared/widgets/rate_limit_banner.dart` — Countdown timer widget for rate limit display
+
+*Tests:*
+- `test/download_queue_test.dart` — 12 unit tests: state transitions, progress computation, sealed class switch
+- `test/history_screen_test.dart` — 5 widget tests: rendering, status chips, date format
+
+*Modified:*
+- `pubspec.yaml` — Added shared_preferences, path dependencies
+- `lib/core/constants.dart` — Notification channel IDs, settings keys/defaults
+- `lib/main.dart` — Init notifications, SharedPreferences override
+- `lib/app.dart` — Added /download, /history, /settings routes; theme mode from settings
+- `lib/features/profile/presentation/home_screen.dart` — Wired download button, history/settings AppBar icons, rate limit countdown banner
+
+*Removed:* 6 `.gitkeep` files from download/ and history/ subdirectories
+
+**Rate limit hotfix (backend + frontend):**
+- `fastapi_backend/src/.../config.py` — Increased delay to 5s, added cooldown_seconds (600) and request_timeout (30)
+- `fastapi_backend/src/.../services/rate_limiter.py` — Added `RateLimitedError` exception, cooldown tracking per session, `record_429()` method
+- `fastapi_backend/src/.../services/instagram.py` — Added `Instagram429Error`, `max_connection_attempts=1` on all loaders, `_run_with_timeout()` wrapper (30s timeout to bail before instaloader retries)
+- `fastapi_backend/src/.../routers/profile.py` — Catches `Instagram429Error` → starts cooldown → returns 429 with Retry-After header; catches `RateLimitedError` during acquire
+- `flutter_app/lib/shared/widgets/rate_limit_banner.dart` — Countdown timer widget
+- `flutter_app/lib/features/profile/presentation/home_screen.dart` — Detects `RateLimitedError`, shows countdown banner with time remaining
+
+**Key decisions:**
+- SharedPreferences (not drift) for settings — avoids async DB init for simple key-value config
+- Lightweight `_Semaphore` class using `Completer` queue for download concurrency control
+- Two Dio instances: `dioProvider` with session header for API, plain `Dio()` for CDN file downloads
+- File downloads to `getExternalStorageDirectory()/SomeBulkDld/{username}/{type}/` — no MANAGE_EXTERNAL_STORAGE needed
+- Backend 429 handling: 30s timeout kills stuck instaloader thread, puts session into 10-minute cooldown, blocks ALL further requests for that session
+- `max_connection_attempts=1` prevents instaloader from retrying internally (which would block for 30 minutes)
+
+**Validations passed:** `just check-flutter` (format, analyze, 16 tests) + `just check-backend` (ruff check, ruff format, 12 pytest) all green.
+
 ## Deviations from Original Plan
 
 - **docs/**: Kept as regular directory instead of submodule (rationale: CI path filters work directly, simpler to manage, tightly coupled to monorepo)
@@ -142,8 +205,8 @@ March 2026
 ## Resume Instructions for Next Session
 
 1. Read this file (`plan.md`) and `CLAUDE.md` for full context
-2. Next stage is **Stage 5: Downloads** — download queue, progress, history
-3. Work inside the `flutter_app/` submodule (remember to commit+push there separately)
+2. Next stage is **Stage 6: Docs** — MkDocs setup, full documentation
+3. Work inside the `docs/` directory
 4. After each stage, update this progress tracker
 
 ---
