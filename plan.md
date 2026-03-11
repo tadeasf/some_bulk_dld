@@ -21,7 +21,7 @@ March 2026
 | Stage 5: Downloads | DONE | 2026-03-11 | Download queue, progress, history, settings, rate limit hotfix |
 | Stage 6: Docs | DONE | 2026-03-11 | MkDocs Material site, 8 pages, root README |
 | Stage 7: CI/CD | DONE | 2026-03-11 | Backend CI + Flutter CI workflows, .env.actions secrets ref |
-| Stage 8: Polish | TODO | | Error handling, tests, hardening |
+| Stage 8: Polish | DONE | 2026-03-11 | 33 backend + 75 Flutter tests, Dio interceptors, structured errors |
 
 ### Stage 1 Completion Details
 
@@ -233,7 +233,7 @@ March 2026
 ## Resume Instructions for Next Session
 
 1. Read this file (`plan.md`) and `CLAUDE.md` for full context
-2. Next stage is **Stage 8: Polish** — Error handling, tests, hardening
+2. **All 8 stages are complete.** The project is at production quality.
 3. Configure GitHub Secrets from `.env.actions` before pushing
 4. After each stage, update this progress tracker
 
