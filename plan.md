@@ -17,7 +17,7 @@ March 2026
 | Stage 1: Scaffolding | DONE | 2026-03-11 | All phases A-L complete (see details below) |
 | Stage 2: Backend | DONE | 2026-03-11 | Full src layout, services, routers, 12 tests passing |
 | Stage 3: Flutter Setup | DONE | 2026-03-11 | Android config, icons, splash, signing, dependencies |
-| Stage 4: Auth & Profile | TODO | | Login flow (inc. 2FA), profile lookup |
+| Stage 4: Auth & Profile | DONE | 2026-03-11 | 14 hand-written + 9 generated files, all checks pass |
 | Stage 5: Downloads | TODO | | Download queue, progress, history |
 | Stage 6: Docs | TODO | | MkDocs setup, full documentation |
 | Stage 7: CI/CD | TODO | | GitHub Actions workflows |
@@ -90,6 +90,49 @@ March 2026
 
 **Validations passed:** `dart format --set-exit-if-changed` clean, `dart analyze --fatal-infos` no issues, `flutter test` 1/1 pass, `build_runner build` success, `flutter build apk --debug` success, `flutter build apk --release` success (50.9MB signed APK).
 
+### Stage 4 Completion Details
+
+**Files created in `flutter_app/` submodule (14 hand-written + 9 generated):**
+
+*Core:*
+- `lib/core/app_error.dart` — Sealed `AppError` type (Network, Unauthorized, NotFound, RateLimited, Server, Unknown) + `mapDioException()` mapper
+
+*Auth feature:*
+- `lib/features/auth/data/auth_dto.dart` — Freezed DTOs: `LoginResponseDto`, `SessionStatusDto` (matching backend models/auth.py)
+- `lib/features/auth/data/auth_repository.dart` — `AuthRepository` with login, complete2fa, logout, checkStatus (all returning `Result`)
+- `lib/features/auth/presentation/auth_state.dart` — Manual sealed class: AuthUnknown, AuthAuthenticated, AuthNeedsTwoFactor, AuthUnauthenticated
+- `lib/features/auth/presentation/auth_provider.dart` — `@Riverpod(keepAlive: true) AuthNotifier` with session restore from SecureStorage
+- `lib/features/auth/presentation/login_screen.dart` — Login form with validation, loading states, error snackbars
+- `lib/features/auth/presentation/two_factor_dialog.dart` — 2FA code entry AlertDialog
+
+*Profile feature:*
+- `lib/features/profile/data/profile_dto.dart` — Freezed DTOs: ProfileInfoDto + MediaItemDto, PaginatedMediaDto, StoryItemDto, HighlightGroupDto, DownloadUrlDto (for Stage 5)
+- `lib/features/profile/data/profile_repository.dart` — `ProfileRepository.getProfile()` returning `Result`
+- `lib/features/profile/presentation/profile_provider.dart` — `@riverpod ProfileNotifier` with lookup/clear
+- `lib/features/profile/presentation/content_toggles.dart` — `ContentType` enum + `@riverpod ContentToggles` toggle map
+- `lib/features/profile/presentation/home_screen.dart` — Username field + lookup + ProfileCard + ContentToggles + disabled Download button
+- `lib/features/profile/presentation/profile_card.dart` — Profile pic, username+verified badge, bio, stats row, private account warning
+
+*Shared:*
+- `lib/shared/widgets/error_banner.dart` — Reusable error Card with dismiss
+
+*Modified:*
+- `lib/core/api_client.dart` — Converted to `@Riverpod(keepAlive: true)` provider + `SessionInterceptor` injecting X-Session-Token
+- `lib/app.dart` — Auth-aware GoRouter with redirect logic (ChangeNotifier bridge to Riverpod)
+- `analysis_options.yaml` — Added `invalid_annotation_target: ignore` for freezed compatibility
+
+*Removed:* 5 `.gitkeep` files from populated directories (auth/data, auth/presentation, profile/data, profile/presentation, shared/widgets)
+
+**Key decisions:**
+- Auth uses standalone Dio (no session interceptor) to avoid circular dependency with dioProvider
+- 2FA is an AlertDialog, not a separate route — transient sub-step of login
+- GoRouter redirect bridges to Riverpod auth state via `ChangeNotifier`
+- `AsyncValue<ProfileInfoDto?>` for profile state — gets loading/error/data for free
+- No separate domain layer — DTOs serve as domain models (backend models are simple value objects)
+- Profile DTOs for media/stories/highlights defined now for Stage 5 completeness
+
+**Validations passed:** `dart format --set-exit-if-changed` clean, `dart analyze --fatal-infos` no issues, `flutter test` 1/1 pass, `build_runner build` 51 outputs generated.
+
 ## Deviations from Original Plan
 
 - **docs/**: Kept as regular directory instead of submodule (rationale: CI path filters work directly, simpler to manage, tightly coupled to monorepo)
@@ -99,9 +142,9 @@ March 2026
 ## Resume Instructions for Next Session
 
 1. Read this file (`plan.md`) and `CLAUDE.md` for full context
-2. Next stage is **Stage 4: Auth & Profile Features** — see section below for full spec
+2. Next stage is **Stage 5: Downloads** — download queue, progress, history
 3. Work inside the `flutter_app/` submodule (remember to commit+push there separately)
-4. After Stage 4, update this progress tracker
+4. After each stage, update this progress tracker
 
 ---
 
