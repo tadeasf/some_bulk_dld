@@ -1,0 +1,52 @@
+site_name: SomeBulkDld
+site_description: Social Media Bulk Downloader — Documentation
+repo_url: https://github.com/tadeasf/some_bulk_dld
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - search.suggest
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - toc:
+      permalink: true
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Backend API: backend-api.md
+  - Flutter App: flutter-app.md
+  - Setup Guide: setup-guide.md
+  - Rate Limiting: rate-limiting.md
+  - Deployment: deployment.md
+  - Contributing: contributing.md

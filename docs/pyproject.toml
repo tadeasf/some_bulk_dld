@@ -1,0 +1,9 @@
+[project]
+name = "some-bulk-dld-docs"
+version = "0.1.0"
+description = "Documentation for SomeBulkDld"
+requires-python = ">=3.12"
+dependencies = [
+    "mkdocs-material>=9.5",
+    "mkdocs-minify-plugin>=0.8",
+]

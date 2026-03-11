@@ -19,7 +19,7 @@ March 2026
 | Stage 3: Flutter Setup | DONE | 2026-03-11 | Android config, icons, splash, signing, dependencies |
 | Stage 4: Auth & Profile | DONE | 2026-03-11 | 14 hand-written + 9 generated files, all checks pass |
 | Stage 5: Downloads | DONE | 2026-03-11 | Download queue, progress, history, settings, rate limit hotfix |
-| Stage 6: Docs | TODO | | MkDocs setup, full documentation |
+| Stage 6: Docs | DONE | 2026-03-11 | MkDocs Material site, 8 pages, root README |
 | Stage 7: CI/CD | TODO | | GitHub Actions workflows |
 | Stage 8: Polish | TODO | | Error handling, tests, hardening |
 
