@@ -1,0 +1,36 @@
+# Environment
+.env
+.env.*
+
+# Android signing
+*.jks
+key.properties
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+
+# Flutter / Dart
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Sessions (instaloader)
+sessions/
+
+# Serena cache
+.serena/cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

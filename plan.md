@@ -9,6 +9,28 @@ March 2026
 
 ---
 
+## Progress Tracker
+
+| Stage | Status | Date | Notes |
+|-------|--------|------|-------|
+| Stage 0: CLAUDE.md | DONE | 2026-03-11 | Created with full onboarding content |
+| Stage 1: Scaffolding | DONE | 2026-03-11 | Submodules fixed, justfile, gitignore, copilot-instructions |
+| Stage 2: Backend | TODO | | |
+| Stage 3: Flutter Setup | TODO | | |
+| Stage 4: Auth & Profile | TODO | | |
+| Stage 5: Downloads | TODO | | |
+| Stage 6: Docs | TODO | | |
+| Stage 7: CI/CD | TODO | | |
+| Stage 8: Polish | TODO | | |
+
+## Deviations from Original Plan
+
+- **docs/**: Kept as regular directory instead of submodule (rationale: CI path filters work directly, simpler to manage, tightly coupled to monorepo)
+- **Private repo names**: `some_bulk_dld-flutter` / `some_bulk_dld-backend`
+- **Architecture**: Public monorepo + private submodules
+
+---
+
 ## Repository Structure
 
 ```
