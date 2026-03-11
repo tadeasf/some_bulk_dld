@@ -15,7 +15,7 @@ March 2026
 |-------|--------|------|-------|
 | Stage 0: CLAUDE.md | DONE | 2026-03-11 | Created with full onboarding content |
 | Stage 1: Scaffolding | DONE | 2026-03-11 | All phases A-L complete (see details below) |
-| Stage 2: Backend | TODO | | Next up — src layout, pyproject.toml, core API endpoints |
+| Stage 2: Backend | DONE | 2026-03-11 | Full src layout, services, routers, 12 tests passing |
 | Stage 3: Flutter Setup | TODO | | Android config, icons, splash, signing, dependencies |
 | Stage 4: Auth & Profile | TODO | | Login flow (inc. 2FA), profile lookup |
 | Stage 5: Downloads | TODO | | Download queue, progress, history |
@@ -52,6 +52,24 @@ March 2026
 - Claude Code auto-memory: `MEMORY.md` with project overview and progress
 
 **All validations passed** (submodule status, .gitmodules, just --list, git status clean, gh repo view).
+
+### Stage 2 Completion Details
+
+**Commits in `fastapi_backend/` submodule (3 commits on `main`):**
+- `c15bf08` — src layout skeleton, pyproject.toml, config.py, Pydantic models (auth + profile)
+- `43a9853` — services (rate_limiter, instagram), routers (auth, profile), main.py
+- `c7ce835` — tests (conftest, test_auth, test_profile), README, .gitignore
+
+**Key decisions:**
+- `requires-python = ">=3.13"` (not 3.14) — instaloader compatibility
+- `[dependency-groups]` for dev deps (PEP 735, modern uv convention)
+- `hatchling` build-system for src-layout wheel packaging
+- `asyncio.to_thread()` for all instaloader calls (synchronous library)
+- Session sidecar files: `{uuid}.session` + `{uuid}.meta.json` for startup recovery
+- `asyncio.Lock` per session in rate limiter for concurrency safety
+- Tests manually wire `app.state` (ASGITransport doesn't trigger lifespan)
+
+**Validations passed:** `ruff check` clean, `ruff format --check` clean, 12/12 pytest pass, instaloader 4.15 imports on Python 3.14.
 
 ## Deviations from Original Plan
 
