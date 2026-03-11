@@ -1,0 +1,30 @@
+name: Backend CI
+
+on:
+  push:
+    paths: ['fastapi_backend/**']
+  pull_request:
+    paths: ['fastapi_backend/**']
+  workflow_dispatch:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: fastapi_backend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.SUBMODULE_PAT }}
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+      - run: uv sync --all-groups
+      - name: Ruff check
+        run: uv run ruff check .
+      - name: Ruff format check
+        run: uv run ruff format --check .
+      - name: Tests
+        run: uv run pytest --cov=src/some_bulk_dld_backend --cov-report=xml -v

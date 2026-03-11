@@ -20,7 +20,7 @@ March 2026
 | Stage 4: Auth & Profile | DONE | 2026-03-11 | 14 hand-written + 9 generated files, all checks pass |
 | Stage 5: Downloads | DONE | 2026-03-11 | Download queue, progress, history, settings, rate limit hotfix |
 | Stage 6: Docs | DONE | 2026-03-11 | MkDocs Material site, 8 pages, root README |
-| Stage 7: CI/CD | TODO | | GitHub Actions workflows |
+| Stage 7: CI/CD | DONE | 2026-03-11 | Backend CI + Flutter CI workflows, .env.actions secrets ref |
 | Stage 8: Polish | TODO | | Error handling, tests, hardening |
 
 ### Stage 1 Completion Details
@@ -196,6 +196,34 @@ March 2026
 
 **Validations passed:** `just check-flutter` (format, analyze, 16 tests) + `just check-backend` (ruff check, ruff format, 12 pytest) all green.
 
+### Stage 7 Completion Details
+
+**Files created in monorepo root:**
+
+*CI Workflows:*
+- `.github/workflows/backend-ci.yml` — Triggers on push/PR to `fastapi_backend/**`. Runs ruff check, ruff format --check, pytest with coverage.
+- `.github/workflows/flutter-ci.yml` — Triggers on push/PR to `flutter_app/**`. Three jobs: lint-and-test, build-debug (artifact upload), build-release (signed APK+AAB, master-only).
+- `.github/workflows/docs.yml` — Already existed from Stage 6 (MkDocs build + GitHub Pages deploy).
+
+*Secrets Reference:*
+- `.env.actions` — Gitignored file with pre-populated KEYSTORE_BASE64, KEY_ALIAS, and blank placeholders for SUBMODULE_PAT, KEYSTORE_PASSWORD, KEY_PASSWORD.
+
+**Key decisions:**
+- Private submodule access via `secrets.SUBMODULE_PAT` (GitHub PAT with `repo` scope) passed to `actions/checkout@v4` `token:` parameter
+- `uv sync --all-groups` for backend (installs all dependency groups including dev)
+- Flutter release build decodes keystore from base64 secret, creates `key.properties` at build time
+- Release job gated on `github.ref == 'refs/heads/master' && github.event_name == 'push'`
+- Debug build job uploads APK artifact for easy download from Actions UI
+
+**GitHub Secrets to configure:**
+| Secret | Value |
+|--------|-------|
+| `SUBMODULE_PAT` | GitHub PAT with `repo` scope |
+| `KEYSTORE_BASE64` | Pre-populated in `.env.actions` |
+| `KEYSTORE_PASSWORD` | User's keystore password |
+| `KEY_PASSWORD` | User's key password |
+| `KEY_ALIAS` | `some_bulk_dld` |
+
 ## Deviations from Original Plan
 
 - **docs/**: Kept as regular directory instead of submodule (rationale: CI path filters work directly, simpler to manage, tightly coupled to monorepo)
@@ -205,8 +233,8 @@ March 2026
 ## Resume Instructions for Next Session
 
 1. Read this file (`plan.md`) and `CLAUDE.md` for full context
-2. Next stage is **Stage 6: Docs** — MkDocs setup, full documentation
-3. Work inside the `docs/` directory
+2. Next stage is **Stage 8: Polish** — Error handling, tests, hardening
+3. Configure GitHub Secrets from `.env.actions` before pushing
 4. After each stage, update this progress tracker
 
 ---
