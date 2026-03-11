@@ -16,7 +16,7 @@ March 2026
 | Stage 0: CLAUDE.md | DONE | 2026-03-11 | Created with full onboarding content |
 | Stage 1: Scaffolding | DONE | 2026-03-11 | All phases A-L complete (see details below) |
 | Stage 2: Backend | DONE | 2026-03-11 | Full src layout, services, routers, 12 tests passing |
-| Stage 3: Flutter Setup | TODO | | Android config, icons, splash, signing, dependencies |
+| Stage 3: Flutter Setup | DONE | 2026-03-11 | Android config, icons, splash, signing, dependencies |
 | Stage 4: Auth & Profile | TODO | | Login flow (inc. 2FA), profile lookup |
 | Stage 5: Downloads | TODO | | Download queue, progress, history |
 | Stage 6: Docs | TODO | | MkDocs setup, full documentation |
@@ -71,6 +71,25 @@ March 2026
 
 **Validations passed:** `ruff check` clean, `ruff format --check` clean, 12/12 pytest pass, instaloader 4.15 imports on Python 3.14.
 
+### Stage 3 Completion Details
+
+**Commits in `flutter_app/` submodule (4 commits on `main`):**
+- `5e86955` — Android config: applicationId `dev.tadeasf.somebulkdld`, minSdk=24, targetSdk=35, permissions, signing, Kotlin package rename
+- `320c475` — Dependencies (riverpod, dio, go_router, drift, etc.), placeholder assets, analysis options, .env
+- `534ff49` — App skeleton: main.dart, app.dart, core modules (logger, result, constants, theme, api_client), feature directories
+- `4e88a30` — Generated launcher icons and splash screen
+
+**Key decisions:**
+- `dev.tadeasf.somebulkdld` as applicationId (user chose `dev` TLD)
+- Core library desugaring enabled (required by flutter_local_notifications)
+- `.env` committed as Flutter asset (no secrets, just localhost backend URL)
+- `dart:developer.log` for logging sink (avoids `print()` per CLAUDE.md)
+- `sealed class Result<T, E>` with `Ok`/`Err` for error handling pattern
+- Release signing keystore generated and wired via `key.properties` (gitignored)
+- Smoke test avoids `App` import to skip dotenv asset loading in test env
+
+**Validations passed:** `dart format --set-exit-if-changed` clean, `dart analyze --fatal-infos` no issues, `flutter test` 1/1 pass, `build_runner build` success, `flutter build apk --debug` success, `flutter build apk --release` success (50.9MB signed APK).
+
 ## Deviations from Original Plan
 
 - **docs/**: Kept as regular directory instead of submodule (rationale: CI path filters work directly, simpler to manage, tightly coupled to monorepo)
@@ -80,9 +99,9 @@ March 2026
 ## Resume Instructions for Next Session
 
 1. Read this file (`plan.md`) and `CLAUDE.md` for full context
-2. Next stage is **Stage 2: FastAPI Backend** — see section below for full spec
-3. Work inside the `fastapi_backend/` submodule (remember to commit+push there separately)
-4. After Stage 2, update this progress tracker
+2. Next stage is **Stage 4: Auth & Profile Features** — see section below for full spec
+3. Work inside the `flutter_app/` submodule (remember to commit+push there separately)
+4. After Stage 4, update this progress tracker
 
 ---
 
