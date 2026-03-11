@@ -14,20 +14,57 @@ March 2026
 | Stage | Status | Date | Notes |
 |-------|--------|------|-------|
 | Stage 0: CLAUDE.md | DONE | 2026-03-11 | Created with full onboarding content |
-| Stage 1: Scaffolding | DONE | 2026-03-11 | Submodules fixed, justfile, gitignore, copilot-instructions |
-| Stage 2: Backend | TODO | | |
-| Stage 3: Flutter Setup | TODO | | |
-| Stage 4: Auth & Profile | TODO | | |
-| Stage 5: Downloads | TODO | | |
-| Stage 6: Docs | TODO | | |
-| Stage 7: CI/CD | TODO | | |
-| Stage 8: Polish | TODO | | |
+| Stage 1: Scaffolding | DONE | 2026-03-11 | All phases A-L complete (see details below) |
+| Stage 2: Backend | TODO | | Next up — src layout, pyproject.toml, core API endpoints |
+| Stage 3: Flutter Setup | TODO | | Android config, icons, splash, signing, dependencies |
+| Stage 4: Auth & Profile | TODO | | Login flow (inc. 2FA), profile lookup |
+| Stage 5: Downloads | TODO | | Download queue, progress, history |
+| Stage 6: Docs | TODO | | MkDocs setup, full documentation |
+| Stage 7: CI/CD | TODO | | GitHub Actions workflows |
+| Stage 8: Polish | TODO | | Error handling, tests, hardening |
+
+### Stage 1 Completion Details
+
+**Commit:** `ec05c03` on `master` (pushed to origin)
+
+**Phase A — GitHub Repos Created:**
+- `tadeasf/some_bulk_dld-flutter` (private) — flutter_app content pushed to `main`
+- `tadeasf/some_bulk_dld-backend` (private) — fastapi_backend content pushed to `main`
+
+**Phase B — Submodules Fixed:**
+- Removed broken gitlink entries (`git rm --cached`)
+- Re-added as proper submodules with `.gitmodules`
+- Both show clean hashes via `git submodule status`
+- `.git` files are ASCII text (gitlink), not directories
+
+**Phase C-G — Files Created:**
+- `.gitignore` — env, signing keys, pycache, build, dart_tool, sessions, serena cache, IDE, OS
+- `justfile` — 28 recipes (check, fmt, build, run, backend, docs, codegen, etc.)
+- `CLAUDE.md` — full AI onboarding (project overview, tech stack, code style, mandatory checks)
+- `.github/copilot-instructions.md` — Context7, Serena, Sequential Thinking, just check
+- `docs/README.md` — placeholder for Stage 6
+
+**Phase H — Serena Config Fixed:**
+- `.serena/project.yml` languages changed from `cpp` to `dart`, `python`
+
+**Phase I — Memory Created:**
+- Serena memories: `project_overview`, `suggested_commands`, `style_and_conventions`, `task_completion_checklist`
+- Claude Code auto-memory: `MEMORY.md` with project overview and progress
+
+**All validations passed** (submodule status, .gitmodules, just --list, git status clean, gh repo view).
 
 ## Deviations from Original Plan
 
 - **docs/**: Kept as regular directory instead of submodule (rationale: CI path filters work directly, simpler to manage, tightly coupled to monorepo)
 - **Private repo names**: `some_bulk_dld-flutter` / `some_bulk_dld-backend`
 - **Architecture**: Public monorepo + private submodules
+
+## Resume Instructions for Next Session
+
+1. Read this file (`plan.md`) and `CLAUDE.md` for full context
+2. Next stage is **Stage 2: FastAPI Backend** — see section below for full spec
+3. Work inside the `fastapi_backend/` submodule (remember to commit+push there separately)
+4. After Stage 2, update this progress tracker
 
 ---
 
